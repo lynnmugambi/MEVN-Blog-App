@@ -48,7 +48,10 @@ app.route('/posts')
 app.route('/posts/:id')
   .get((req, res) => {
     Post.findById(req.params.id, 'title description', (error, post) =>  {
-      if (error) { console.error(error); }
+      if (error) { res.send(error); }
+      if(post == null){ res.send({
+        "error":"This ID cannot be found."
+      })}
       res.send(post)
     })
   })
@@ -56,7 +59,13 @@ app.route('/posts/:id')
   // Update a post
   .put((req, res) => {
     Post.findById(req.params.id, 'title description', function (error, post) {
-      if (error) { console.error(error); }
+      if (error) { res.send(error); }
+
+      if(!post){
+        res.send({
+          "error": "This ID can not be found"
+        })
+      }
   
       post.title = req.body.title
       post.description = req.body.description
@@ -71,10 +80,17 @@ app.route('/posts/:id')
     })
   })
 
+  //delete single post
   .delete((req, res) => {
-    Post.deleteOne({_id: req.params.id}, (err) => {
+    Post.deleteOne({_id: req.params.id}, (err, post) => {
       if (err)
         res.send(err)
+
+      console.log(post)
+      if(post.deletedCount == 0){ res.send({
+        "error":"This ID cannot be found."
+      })}
+
       res.send({
         success: "Post deleted!"
       })
