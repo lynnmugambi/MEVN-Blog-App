@@ -5,7 +5,7 @@ const app = express.Router();
 
 app.route('/posts')
   .get((req, res) => {
-    Post.find({}, 'title description', (error, posts) =>  {
+    Post.find({}, 'title description', (error, posts) => {
       if (error) { console.error(error); }
       res.send({
         posts: posts
@@ -35,7 +35,7 @@ app.route('/posts')
 
   //delete all posts
   .delete((req, res) => {
-    Post.deleteMany({},(err, post) => {
+    Post.deleteMany({}, (err, post) => {
       if (err)
         res.send(err)
       res.send({
@@ -47,49 +47,53 @@ app.route('/posts')
 //Fetch single post
 app.route('/posts/:id')
   .get((req, res) => {
-    Post.findById(req.params.id, 'title description', (error, post) =>  {
+    Post.findById(req.params.id, 'title description', (error, post) => {
       if (error) { res.send(error); }
-      if(post == null){ res.send({
-        "error":"This ID cannot be found."
-      })}
+      if (post == null) {
+        res.send({
+          "error": "This ID cannot be found."
+        })
+      }
       res.send(post)
     })
   })
-  
+
   // Update a post
   .put((req, res) => {
     Post.findById(req.params.id, 'title description', function (error, post) {
       if (error) { res.send(error); }
 
-      if(!post){
+      if (!post) {
         res.send({
           "error": "This ID can not be found"
         })
-      }
-  
-      post.title = req.body.title
-      post.description = req.body.description
-      post.save( (error) => {
-        if (error) {
-          console.log(error)
-        }
-        res.send({
-          success: "Post has been updated"
+      } else {
+        post.title = req.body.title
+        post.description = req.body.description
+        post.save((error) => {
+          if (error) {  
+            console.log(error)
+          }
+          res.send({
+            success: "Post has been updated"
+          })
         })
-      })
+      }
     })
   })
 
   //delete single post
   .delete((req, res) => {
-    Post.deleteOne({_id: req.params.id}, (err, post) => {
+    Post.deleteOne({ _id: req.params.id }, (err, post) => {
       if (err)
         res.send(err)
 
       console.log(post)
-      if(post.deletedCount == 0){ res.send({
-        "error":"This ID cannot be found."
-      })}
+      if (post.deletedCount == 0) {
+        res.send({
+          "error": "This ID cannot be found."
+        })
+      }
 
       res.send({
         success: "Post deleted!"
