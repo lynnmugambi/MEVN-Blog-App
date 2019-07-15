@@ -5,7 +5,7 @@ const app = express.Router();
 
 app.route('/posts')
   .get((req, res) => {
-    Post.find({}, 'title description', function (error, posts) {
+    Post.find({}, 'title description', (error, posts) =>  {
       if (error) { console.error(error); }
       res.send({
         posts: posts
@@ -15,7 +15,6 @@ app.route('/posts')
 
   // Add new post
   .post((req, res) => {
-    //var db = req.db;
     var title = req.body.title;
     var description = req.body.description;
     var new_post = new Post({
@@ -23,7 +22,7 @@ app.route('/posts')
       description: description
     })
 
-    new_post.save(function (error) {
+    new_post.save((error) => {
       if (error) {
         console.log(error)
       }
@@ -34,13 +33,50 @@ app.route('/posts')
     })
   })
 
+  //delete all posts
   .delete((req, res) => {
-    var db = req.db;
-    Post.deleteMany({}, function (err, post) {
+    Post.deleteMany({},(err, post) => {
       if (err)
         res.send(err)
       res.send({
         success: true
+      })
+    })
+  })
+
+//Fetch single post
+app.route('/posts/:id')
+  .get((req, res) => {
+    Post.findById(req.params.id, 'title description', (error, post) =>  {
+      if (error) { console.error(error); }
+      res.send(post)
+    })
+  })
+  
+  // Update a post
+  .put((req, res) => {
+    Post.findById(req.params.id, 'title description', function (error, post) {
+      if (error) { console.error(error); }
+  
+      post.title = req.body.title
+      post.description = req.body.description
+      post.save( (error) => {
+        if (error) {
+          console.log(error)
+        }
+        res.send({
+          success: "Post has been updated"
+        })
+      })
+    })
+  })
+
+  .delete((req, res) => {
+    Post.deleteOne({_id: req.params.id}, (err) => {
+      if (err)
+        res.send(err)
+      res.send({
+        success: "Post deleted!"
       })
     })
   })
